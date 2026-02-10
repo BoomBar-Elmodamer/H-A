@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        :root {
+            --pink: #ff4d6d;
+            --soft-pink: #fff0f3;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--soft-pink);
+            color: #590d22;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container { width: 90%; max-width: 400px; padding: 20px; }
+        .hidden { display: none !important; }
+        
+        /* Proposal Page */
+        h1 { font-size: 2rem; margin-bottom: 2rem; }
+        .btn-group { position: relative; height: 100px; }
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        #yesBtn { background-color: var(--pink); color: white; }
+        #noBtn {
+            background-color: #ccc;
+            color: #666;
+            position: absolute;
+            white-space: nowrap;
+        }
+
+        /* Story Page */
+        #storyPage h2 { color: var(--pink); }
+        .timer {
+            font-size: 1.1rem;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Infinite 3D Carousel */
+        .carousel-container {
+            position: relative;
+            height: 250px;
+            margin: 40px 0;
+            perspective: 1000px;
+        }
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        .carousel-item {
+            position: absolute;
+            width: 150px;
+            height: 200px;
+            left: 50%;
+            margin-left: -75px;
+            border-radius: 10px;
+            object-fit: cover;
+            transition: transform 0.5s, opacity 0.5s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="proposalPage" class="container">
+        <h1>Will you be my Valentine? ❤️</h1>
+        <div class="btn-group">
+            <button id="yesBtn" onclick="showStory()">YES</button>
+            <button id="noBtn" onmouseover="moveNoButton()" onclick="moveNoButton()">No</button>
+        </div>
+    </div>
+
+    <div id="storyPage" class="container hidden">
+        <h1>Yay! 🥰</h1>
+        <p>You just made my heart the happiest.</p>
+        
+        <div class="timer" id="timer">Loading our time...</div>
+
+        <h3>Our Memories</h3>
+        <div class="carousel-container">
+            <div class="carousel" id="carousel">
+                <img src="photo_5989860484943302293_y.jpg" class="carousel-item" alt="1">
+                <img src="photo_5989893500356905151_y.jpg" class="carousel-item" alt="2">
+                <img src="photo_5989893500356905178_y.jpg" class="carousel-item" alt="3">
+                <img src="photo_5989893500356905255_y.jpg" class="carousel-item" alt="4">
+            </div>
+        </div>
+        <p><small>(Swipe to browse)</small></p>
+    </div>
+
+    <script>
+        // 1. Dodge the "No" button
+        function moveNoButton() {
+            const btn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+            btn.style.position = 'fixed';
+        }
+
+        // 2. Switch Pages
+        function showStory() {
+            document.getElementById('proposalPage').classList.add('hidden');
+            document.getElementById('storyPage').classList.remove('hidden');
+            startTimer();
+            updateCarousel();
+        }
+
+        // 3. Timer (Since 5/11/2024 - Note: Assuming MM/DD/YYYY)
+        function startTimer() {
+            const startDate = new Date('2024-05-11T00:00:00');
+            setInterval(() => {
+                const now = new Date();
+                const diff = now - startDate;
+                const years = Math.floor(diff / (1000 * 365));
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const mins = Math.floor((diff / 1000 / 60) % 60);
+                const secs = Math.floor((diff / 1000) % 60);
+                
+                document.getElementById('timer').innerHTML = 
+                    `We've been together for:<br><strong>${years}Years ${days}Days ${hours}Hours ${mins}Minutes ${secs}Seconds </strong>`;
+            }, 1000);
+        }
+
+        // 4. Infinite Carousel Logic
+        let currentIndex = 0;
+        const items = document.querySelectorAll('.carousel-item');
+        
+        function updateCarousel() {
+            items.forEach((item, index) => {
+                item.style.display = 'block';
+                let offset = index - currentIndex;
+                
+                // Infinite loop logic
+                if (offset > 1) offset = offset - items.length;
+                if (offset < -1) offset = offset + items.length;
+
+                if (offset === 0) {
+                    item.style.transform = `translateX(0) scale(1.2) rotateY(0deg)`;
+                    item.style.zIndex = 10;
+                    item.style.opacity = 1;
+                } else if (offset === 1) {
+                    item.style.transform = `translateX(120px) scale(0.8) rotateY(-30deg)`;
+                    item.style.zIndex = 5;
+                    item.style.opacity = 0.6;
+                } else if (offset === -1) {
+                    item.style.transform = `translateX(-120px) scale(0.8) rotateY(30deg)`;
+                    item.style.zIndex = 5;
+                    item.style.opacity = 0.6;
+                } else {
+                    item.style.opacity = 0;
+                }
+            });
+        }
+
+        // Swipe Detection
+        let touchStartX = 0;
+        document.getElementById('carousel').addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.getElementById('carousel').addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].clientX;
+            if (touchStartX - touchEndX > 50) { // Swipe Left
+                currentIndex = (currentIndex + 1) % items.length;
+            } else if (touchStartX - touchEndX < -50) { // Swipe Right
+                currentIndex = (currentIndex - 1 + items.length) % items.length;
+            }
+            updateCarousel();
+        });
+    </script>
+</body>
+</html>
